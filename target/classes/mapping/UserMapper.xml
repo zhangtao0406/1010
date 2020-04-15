@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zy.demo.mapper.UserMapper">
+
+    <!-- 查询所有用户
+        List<User> findUserAll(@Param ("userName") String userName, @Param ("departmentName") String departmentName, @Param ("loginId") String loginId, @Param ("userPhone") String userPhone);
+    -->
+    <select id="findUserAll" resultType="User">
+       SELECT
+	        `user`.*, department.id AS departmentid,
+	        department.department_name AS departmentName,
+	        department.department_num AS departmentNum
+       FROM
+	        `user`
+       LEFT JOIN department ON `user`.department_id = department.id
+        <where>
+            <if test="userName!=null and userName!=''">
+                and `user`.user_name LIKE '%${userName}%'
+            </if>
+            <if test="departmentName!=null and departmentName!=''">
+                and department.department_name LIKE '%${departmentName}%'
+            </if>
+            <if test="loginId!=null and loginId!=''">
+                and `user`.login_id LIKE '%${loginId}%'
+            </if>
+            <if test="userPhone!=null and userPhone!=''">
+                and `user`.user_phone LIKE '%${userPhone}%'
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询部门
+        List<Department> departmentAll();
+      -->
+    <select id="departmentAll" resultType="Department">
+        SELECT * FROM department WHERE d_id!=0
+    </select>
+
+
+    <!--查看今年用户数量  为了生成员工编号
+        Integer userCode(String year);
+    -->
+    <select id="userCode" resultType="Integer">
+        SELECT COUNT(1) FROM user where create_time like "%"#{year}"%"
+    </select>
+
+    <!--用户添加
+        int addUser(User user);
+    -->
+    <insert id="addUser" parameterType="com.zy.demo.pojo.User">
+       INSERT INTO `user`(user_num,user_name,login_id,password,user_phone,department_id,user_email,create_time,activated_status,user_status,comment)
+        value (#{userNum},#{userName},#{loginId},123,#{userPhone},#{departmentId},#{userEmail},now(),#{activatedStatus},0,#{comment})
+    </insert>
+
+    <!-- 根据id查询用户
+        User findUserAllById(Integer id);
+    -->
+    <select id="findUserAllById" resultType="User">
+        SELECT
+        `user`.*, department.id AS departmentid,
+        department.department_name AS departmentName,
+        department.department_num AS departmentNum
+        FROM
+        `user`
+        LEFT JOIN department ON `user`.department_id = department.id
+        where  `user`.id = #{id}
+    </select>
+
+    <!-- 查询角色名称和角色
+        List<Role> findUserDepartmentById(Integer id);
+    -->
+    <select id="findUserDepartmentById" resultType="Role">
+        SELECT id AS user_id,user_name FROM `user` WHERE id =#{id}
+    </select>
+
+
+    <!-- 查询所有角色
+        List<Role> RoleAll();
+    -->
+    <select id="RoleAll" resultType="Role">
+        SELECT * FROM role
+    </select>
+
+    <!-- 添加用户角色相当于修改
+        int userRoleUpdate(@Param ("userId") Integer userId,@Param ("roleId") Integer roleId);
+       -->
+    <insert id="userRoleUpdate" parameterType="com.zy.demo.pojo.UserRole">
+       INSERT INTO user_role(user_id,role_id)value (#{userId},#{roleId})
+    </insert>
+
+    <!--删除用户角色
+        int userRoleDelete(Integer userId);
+      -->
+    <delete id="userRoleDelete">
+        DELETE FROM user_role WHERE user_id = #{userId}
+    </delete>
+
+    <!--重置密码
+        int userUpdatePassWord(@Param ("id") Integer id, @Param ("password") Integer password);
+       -->
+    <update id="userUpdatePassWord">
+        UPDATE  `user` SET password = #{password} where id =#{id}
+    </update>
+
+
+    <!-- 查询所有正式人员信息 外加模糊查询
+        List<User> findUserRecordAll(User user);
+        -->
+    <select id="findUserRecordAll" parameterType="User" resultType="User">
+        SELECT
+        `user`.*, department.id AS departmentid,
+        department.department_name AS departmentName,
+        department.department_num AS departmentNum
+        FROM
+        `user`
+        LEFT JOIN department ON `user`.department_id = department.id
+        <where>
+            `user`.user_status in (0,1,2)
+            <if test="userNum!=null and userNum!=''">
+                and `user`.user_num LIKE '%${userNum}%'
+            </if>
+            <if test="userName!=null and userName!=''">
+                and `user`.user_name LIKE '%${userName}%'
+            </if>
+            <if test="departmentName!=null and departmentName!=''">
+                and department.department_name LIKE '%${departmentName}%'
+            </if>
+            <if test="certificateNumber!=null and certificateNumber!=''">
+                and `user`.certificate_number LIKE '%${certificateNumber}%'
+            </if>
+            <if test="userStatus!=null and userStatus!=''">
+                and user_status = #{userStatus}
+            </if>
+            <if test="duty!=null and duty!=''">
+                and `user`.duty LIKE '%${duty}%'
+            </if>
+        </where>
+    </select>
+
+
+    <!--正式员工管理添加
+        int addUserUserRecord(User user);
+   -->
+    <insert id="addUserUserRecord" parameterType="com.zy.demo.pojo.User">
+       INSERT INTO `user`(user_num,login_id,password,user_name,user_papers,gender,birthday,certificate_number,highest_education,user_phone,user_email,politics_status,comment,duty,titles,rank,department_id,create_time,activated_status,user_status,basepay,old_insurance,medical_insurance,unemployment_insurance,work_insurance,accrue_insurance,reserved_funds,enterprise_annuity)
+        value (#{userNum},#{loginId},123,#{userName},#{userPapers},#{gender},#{birthday},#{certificateNumber},#{highestEducation},#{userPhone},#{userEmail},#{politicsStatus},#{comment},#{duty},#{titles},#{rank},#{departmentId},#{createTime},#{activatedStatus},#{userStatus},#{basepay},#{oldInsurance},#{medicalInsurance},#{unemploymentInsurance},#{workInsurance},#{accrueInsurance},#{reservedFunds},#{enterpriseAnnuity})
+    </insert>
+
+    <!--查询借调信息
+        List<SecondMessage> secondMessageAll(int id);
+    -->
+    <select id="secondMessageAll" resultType="com.zy.demo.pojo.SecondMessage">
+         SELECT `second_message`.*,`department`.`department_name`,(SELECT `department`.`department_name`
+        FROM `user`,`department`
+        WHERE `user`.`department_id`=`department`.`id` AND `user`.`id`=#{id})AS udept
+        FROM `second_message`,`department` WHERE user_id=#{id} AND `second_message`.`department_id`=`department`.`id`
+    </select>
+
+    <!--查询转岗信息
+        List<TransferMessage> transferMessageAll(int id);
+    -->
+    <select id="transferMessageAll" resultType="com.zy.demo.pojo.TransferMessage">
+             SELECT `transfer_message`.*,`department`.`department_name`,(SELECT `department`.`department_name`
+             FROM `user`,`department`
+             WHERE `user`.`department_id`=`department`.`id` AND `user`.`id`=#{id})AS udept
+             FROM `transfer_message`,`department` WHERE user_id=#{id} AND `transfer_message`.`department_id`=`department`.`id`
+
+    </select>
+
+    <!--编辑人员信息
+        int UpdateUserRecord(User user)
+    -->
+    <update id="UpdateUserRecord" parameterType="com.zy.demo.pojo.User">
+        UPDATE  `user` SET user_name = #{userName},login_id=#{loginId},user_phone=#{userPhone},user_email=#{userEmail},department_id=#{departmentId},duty=#{duty},titles=#{titles},rank=#{rank},comment=#{comment} WHERE id=#{id}
+    </update>
+
+    <!--借调用户
+        int JDuser(SecondMessage secondMessage);
+    -->
+    <insert id="JDuser">
+        INSERT INTO `second_message`(user_id,department_id,second_time,second_date)
+        VALUE (#{userId},#{departmentId},#{secondTime},#{secondDate})
+    </insert>
+
+    <!--转岗用户
+    int ZGuser(TransferMessage transferMessage);
+    -->
+    <insert id="ZGuser">
+        INSERT INTO `transfer_message`(user_id,department_id,transfer_time,original_department)
+        VALUE (#{userId},#{departmentId},#{transferTime},#{originalDepartment})
+    </insert>
+
+    <!--修改岗位用户
+    int ZGxg(Integer userId);
+    -->
+    <update id="ZGxg">
+        UPDATE `user` SET department_id=#{departmentId} WHERE id=#{id}
+    </update>
+
+    <!--员工离职
+    int liZhiUser(int id);
+    -->
+    <update id="liZhiUser">
+        UPDATE  user SET user_status =1,retire_time=now() where id = #{id}
+    </update>
+
+    <!--员工退休
+    int tuiXiuUser(int id);
+    -->
+    <update id="tuiXiuUser">
+        UPDATE  user SET user_status =2,retire_time=now() where id = #{id}
+    </update>
+
+    <!--查询所有临时在职人员信息 外加模糊查询
+    List<User> findUserRecordAllUserStatus3(User user);
+    -->
+    <select id="findUserRecordAllUserStatus3" resultType="com.zy.demo.pojo.User">
+        SELECT `user`.*,`department`.* FROM `department`,`user`
+        <where>
+            user.department_id=department.`id` AND `user`.user_status=3
+            <if test="userNum!=null and userNum!=''">
+                and `user`.user_num LIKE '%${userNum}%'
+            </if>
+            <if test="userName!=null and userName!=''">
+                and `user`.user_name LIKE '%${userName}%'
+            </if>
+            <if test="departmentName!=null and departmentName!=''">
+                and department.department_name LIKE '%${departmentName}%'
+            </if>
+            <if test="certificateNumber!=null and certificateNumber!=''">
+                and `user`.certificate_number LIKE '%${certificateNumber}%'
+            </if>
+            <if test="gender!=null and gender!=''">
+                and `user`.gender = #{gender}
+            </if>
+            <if test="duty!=null and duty!=''">
+                and `user`.duty LIKE '%${duty}%'
+            </if>
+        </where>
+    </select>
+
+
+    <!--员工转正
+        int zhuanzhengUser(int id);
+    -->
+    <update id="zhuanzhengUser">
+        UPDATE  user SET user_status =0,create_time=now() where id = #{id}
+    </update>
+    <!--查询所有在职人员信息 外加模糊查询
+        List<User> findUserRecordAllUserStatus0(User user);
+       -->
+    <select id="findUserRecordAllUserStatus0" resultType="com.zy.demo.pojo.User">
+        SELECT `user`.*,`department`.* FROM `department`,`user`
+        <where>
+            user.department_id=department.`id` AND `user`.user_status=0
+            <if test="userNum!=null and userNum!=''">
+                and `user`.user_num LIKE '%${userNum}%'
+            </if>
+            <if test="userName!=null and userName!=''">
+                and `user`.user_name LIKE '%${userName}%'
+            </if>
+            <if test="departmentName!=null and departmentName!=''">
+                and department.department_name LIKE '%${departmentName}%'
+            </if>
+            <if test="certificateNumber!=null and certificateNumber!=''">
+                and `user`.certificate_number LIKE '%${certificateNumber}%'
+            </if>
+            <if test="gender!=null and gender!=''">
+                and `user`.gender = #{gender}
+            </if>
+            <if test="duty!=null and duty!=''">
+                and `user`.duty LIKE '%${duty}%'
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询所有父级部门
+        List<Department> departmentFtherAll();
+          -->
+    <select id="departmentFtherAll" resultType="Department">
+        SELECT * FROM department WHERE d_id = 0
+    </select>
+
+    <!--每日新增用户数量
+        Integer countXinZengUserAll();
+    -->
+    <select id="countXinZengUserAll" resultType="Integer">
+       select count(*) from `user` where date(create_time) = curdate()
+    </select>
+
+    <select id="credis" resultType="Goods">
+        select * from goods
+    </select>
+</mapper>

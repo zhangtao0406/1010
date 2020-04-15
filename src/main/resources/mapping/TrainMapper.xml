@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zy.demo.mapper.TrainMapper">
+
+    <!--查询培训信息
+        List<Train> findTrainAll(Train train);
+        -->
+    <select id="findTrainAll" resultType="com.zy.demo.pojo.Train">
+        SELECT 	train.*, `department`.department_name,department.department_num FROM `train`,department
+        <where>
+            train.department_id = department.`id`
+            AND `train`.train_status IN (0, 3, 4, 5)
+            <if test="trainName!=null and trainName!=''">
+                and `train`.train_name LIKE '%${trainName}%'
+            </if>
+            <if test="departmentName!=null and departmentName!=''">
+                and department.department_name LIKE '%${departmentName}%'
+            </if>
+            <if test="trainStatus!=null and trainStatus!=''">
+                and `train`.train_status = #{trainStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--查看今年培训表数量  为了生成培训编号
+    Integer trainCode(String year);
+    -->
+    <select id="trainCode" resultType="Integer">
+        SELECT COUNT(1) FROM train where publish_time like "%"#{year}"%"
+    </select>
+
+    <!--添加培训
+        int findaddTrain(Train train);
+        useGeneratedKeys:是否开启返回自增主键
+        keyProperty:得到的值保存到那个字段中
+       -->
+    <insert id="findaddTrain" parameterType="com.zy.demo.pojo.Train" keyProperty="id" useGeneratedKeys="true">
+        insert  into train (train_num,train_name,department_id,publish_time,achieve_time,user_name,train_status,train_content,comment)
+                    values (#{trainNum},#{trainName},#{departmentId},now(),#{achieveTime},#{userName},0,#{trainContent},#{comment})
+    </insert>
+
+    <!--添加附件
+        int findaddAccessory(Accessory accessory);
+       -->
+    <insert id="findaddAccessory" parameterType="com.zy.demo.pojo.Accessory">
+        insert  into accessory (train_id,accessory_name,accessory_url)
+                    values (#{trainId},#{accessoryName},#{accessoryUrl})
+    </insert>
+
+    <!--培训详情
+        Train trainAllById(Integer id);
+    -->
+    <select id="trainAllById" resultType="com.zy.demo.pojo.Train">
+       SELECT
+    	    train.*, `department`.department_name,
+	        department.department_num
+       FROM
+	        `train`,
+	        department
+       WHERE
+	        train.department_id = department.`id`
+       AND train.id =  #{id}
+    </select>
+
+    <!--培训详情附件
+        List<Train> trainAndAccessoryAllById(Integer id);
+    -->
+    <select id="trainAndAccessoryAllById" resultType="com.zy.demo.pojo.Train">
+      SELECT
+	    accessory.*
+      FROM
+	    `train`,
+	    accessory,
+	    department
+      WHERE
+	    train.id = accessory.train_id
+      AND train.department_id = department.`id`
+      AND train.id =  #{id}
+    </select>
+
+    <!--培训驳回
+        int boHuiTrain(int id);
+    -->
+    <update id="boHuiTrain">
+        UPDATE  train SET train_status =1 where id = #{id}
+    </update>
+
+    <!--培训办结
+        int banJieTrain(int id);
+    -->
+    <update id="banJieTrain">
+        UPDATE  train SET train_status =4 where id = #{id}
+    </update>
+
+    <!--培训终止
+        int trainingToTerminate(int id);
+   -->
+    <update id="trainingToTerminate">
+        UPDATE  train SET train_status =5 where id = #{id}
+    </update>
+
+    <!--进度
+        List<TrainPlan> TrainPlanById(Integer id);
+       -->
+    <select id="TrainPlanById" resultType="com.zy.demo.pojo.TrainPlan">
+        SELECT
+	        train_plan.*, department.id,
+	        department.department_name,
+	        department.department_num
+        FROM
+	        train,
+	        train_plan,
+	        department
+        WHERE
+	        train_plan.department_id = department.id
+        AND train_plan.train_id = train.id
+        AND train.id = #{id}
+    </select>
+
+    <!--进度情况详情
+        TrainPlan TrainPlanMessageById(Integer id);
+       -->
+    <select id="TrainPlanMessageById" resultType="com.zy.demo.pojo.TrainPlan">
+        select train_plan.* from train,train_plan where  train_plan.train_id=train.id and  train_plan.id = #{id}
+    </select>
+
+    <!--查询培训执行
+        List<Train> TrainingPerformedAll(Train train);
+        -->
+    <select id="TrainingPerformedAll" resultType="com.zy.demo.pojo.Train">
+        SELECT 	train.*, `department`.department_name,department.department_num FROM `train`,department
+        <where>
+            train.department_id = department.`id`
+            AND `train`.train_status IN (1,2,3)
+            <if test="trainNum!=null and trainNum!=''">
+                and `train`.train_num LIKE '%${trainNum}%'
+            </if>
+            <if test="trainName!=null and trainName!=''">
+                and `train`.train_name LIKE '%${trainName}%'
+            </if>
+            <if test="trainStatus!=null and trainStatus!=''">
+                and `train`.train_status = #{trainStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--添加进度
+        int addJinDu(TrainPlan trainPlan);
+      -->
+    <insert id="addJinDu" parameterType="com.zy.demo.pojo.TrainPlan">
+        insert  into train_plan (train_id,feedback_status,feedback_content,repulse_opinion,department_id)
+                    values (#{trainId},0,#{feedbackContent},#{repulseOpinion},#{departmentId})
+    </insert>
+
+    <!--进度提交
+        int jinDuTiJiao(int id);
+      -->
+    <update id="jinDuTiJiao">
+        UPDATE  train_plan SET feedback_status =1 where id = #{id}
+    </update>
+
+    <!--进度打回
+            int jinDuDaHui(int id);
+       -->
+    <update id="jinDuDaHui">
+        UPDATE  train_plan SET feedback_status =2 where id = #{id}
+    </update>
+
+    <!--培训执行
+        int peiXunZhiXing(int id);
+       -->
+    <update id="peiXunZhiXing">
+        UPDATE  train SET train_status =2 where id = #{id}
+    </update>
+
+    <!--培训反馈
+        int peiXunFanKui(int id);
+         -->
+    <update id="peiXunFanKui">
+        UPDATE  train SET train_status =3 where id = #{id}
+    </update>
+
+</mapper>

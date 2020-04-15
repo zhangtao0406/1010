@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zy.demo.mapper.LoginMapper">
+
+    <!-- //用户登录
+        User indexUser(@Param ("loginId") String loginId, @Param ("password") String password);-->
+    <select id="indexUser" resultType="User">
+        select *
+        from user
+        where login_id=#{loginId}
+        and password=#{password}
+    </select>
+
+    <!--//获取用户权限
+        List<Power> getPowerById(Integer id);-->
+    <select id="getPowerById" resultMap="getPowerByIdMap">
+        select p.*,rp.role_id rId
+            from power p,role_power rp
+            where p.power_id+0=rp.power_id
+            and rp.role_id=(SELECT role_id from user_role WHERE user_id=#{id} )
+            and LENGTH(p.power_id)=3
+    </select>
+    <resultMap id="getPowerByIdMap" type="Power" autoMapping="true">
+        <id property="id" column="id"></id>
+        <id property="powerId" column="power_id"></id>
+        <id property="power" column="power"></id>
+        <id property="url" column="url"></id>
+        <id property="pId" column="p_id"></id>
+        <id property="rId" column="rId"></id>
+        <collection property="powerList" ofType="Power" select="getPowerByRidSubSql"
+                    column="{rId=rId,pId=id}"></collection>
+    </resultMap>
+    <select id="getPowerByRidSubSql" resultType="Power">
+        SELECT p.*,rp.role_id rId
+            FROM power p,role_power rp
+            WHERE rp.role_id=#{rId}
+            and p.power_id+0=rp.power_id
+            and LENGTH(p.power_id)=6
+            and p.p_id=#{pId}
+    </select>
+
+    <!--用总户
+        Integer countUserAll();
+        -->
+    <select id="countUserAll" resultType="Integer">
+        SELECT COUNT(1) FROM user
+    </select>
+
+    <!--临时用户
+        Integer countLinShiUserAll();
+        -->
+    <select id="countLinShiUserAll" resultType="Integer">
+        SELECT COUNT(1) FROM user where user_status = 3
+    </select>
+
+    <!--每日新增用户数量
+        Integer countXinZengUserAll();
+    -->
+    <select id="countXinZengUserAll" resultType="Integer">
+       select count(*) from `user` where date(create_time) = curdate()
+    </select>
+
+    <!--查看所有未读取通知
+        List<Notice> NoticeWeiDuQuAll();
+        -->
+    <select id="NoticeWeiDuQuAll" resultType="com.zy.demo.pojo.Notice">
+            SELECT * FROM notice WHERE notice_status = 0
+    </select>
+
+    <!--查看所有通知
+        List<Notice> NoticeAll();
+        -->
+    <select id="NoticeAll" resultType="com.zy.demo.pojo.Notice">
+            SELECT * FROM notice
+    </select>
+
+    <!--通知管理读取
+        int DuQuNotice(Notice notice);
+         -->
+    <update id="DuQuNotice" parameterType="com.zy.demo.pojo.Notice">
+        UPDATE notice SET notice_status = 1,operator = #{operator} WHERE id=#{id}
+    </update>
+</mapper>

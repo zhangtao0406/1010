@@ -1,0 +1,129 @@
+.container-fluid{
+	padding: 0;
+	margin: 0;
+}
+.banner{
+	width: 100%;
+	height: 450px;
+	background: url(../img/banner.jpg) no-repeat center center;
+	position: relative;
+}
+.login{
+	width: 450px;
+	position: absolute;
+	left: 55%;
+	background: url(../img/dl-bg.png) no-repeat center center;
+	padding: 5% 5%;
+	top: 50%;
+	transform: translate(0,-50%);
+}
+.login h3{
+	font-weight: bold;
+	text-align: center;
+	margin: 0 0 6% 13%;
+}
+.login label{
+	width: 25%;
+	text-align: right;
+	height: 30px;
+	line-height: 30px;
+	font-weight: normal;
+}
+.login input{
+	width: 70%;
+	height: 30px;
+	line-height: 30px;
+	border: 1px solid #6b6b6b;
+	padding: 5px;
+}
+.login .yzm{
+	width: 35%;
+}
+.login .number{
+	border: 1px solid #eee;
+	height: 28px;
+	width: 30%;
+	display: inline-block;
+}
+.login .btn-info{
+	width: 35%;
+	height: 30px;
+	line-height: 18px;
+	text-align: center;
+	margin-left: 14%;
+}
+.login .bottom{
+	margin-top: 2%;
+	text-align: center;
+}
+.login .wjma{
+	margin-left: 3%;
+	color: #AEAEAE;
+}
+.login .wjma:hover{
+	cursor: pointer;
+}
+.banner .lxkf{
+	position: absolute;
+	right: 1%;
+	bottom: -90%;
+	width: 96px;
+	height: 100px;
+	z-index: 99;
+	background: url(../img/lxkf.png) no-repeat center center;
+	background-size: 100% 100%;
+}
+.banner .lxkf:hover{
+	cursor: pointer;
+}
+.banner .lxkf span{
+	display: block;
+	margin: 95px 0 0 10px;
+	width: 80px;
+	padding: 1px;
+	background: yellow;
+	border-radius: 3px;
+}
+
+.footer{
+	background: #eee;
+	padding: 2% 5% .5%;
+}
+.footer p{
+	padding-left: 40px;
+}
+.footer .left,.footer .center,.footer .right{
+	width: 33%;
+	display: inline-block;
+	vertical-align: top;
+	
+}
+.footer .lxfs{
+	margin-top: 2%;
+	width: 62%;
+	border-top: 1px solid #000;
+	padding-top: 1%;
+}
+.footer .lxfs .icon1{
+	background: url(../img/icon1.png) no-repeat left center;
+}
+.footer .lxfs .icon2{
+	background: url(../img/icon2.png) no-repeat left center;
+}
+.footer .lxfs .icon3{
+	background: url(../img/icon3.png) no-repeat left center;
+}
+.footer .center ul{
+	display: inline-block;
+	vertical-align: top;
+	margin-right: 10%;
+}
+.footer .center li h3{
+	font-weight: bold;
+}
+.footer .bottom{
+	margin-top: 2%;
+}
+canvas{
+	vertical-align: middle;
+}

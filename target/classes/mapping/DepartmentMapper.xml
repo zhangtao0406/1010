@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zy.demo.mapper.DepartmentMapper">
+
+    <!-- 查询所有总部门信息
+        List<Department> findDepartmentAll();
+        -->
+    <select id="findDepartmentAll" resultType="com.zy.demo.pojo.Department">
+        SELECT * FROM department WHERE d_id=0
+    </select>
+
+    <!--根据父级查询对应的子级部门信息详情
+        List<Department> findDepartmentFatherById(Integer id);
+        -->
+    <select id="findDepartmentFatherById" resultType="com.zy.demo.pojo.Department">
+        SELECT * FROM department WHERE d_id=#{id}
+    </select>
+
+    <!--根据父级查询对应的子级部门信息详情进行修改，数据回显
+        Department updateDepartmentFatherById(Integer id);
+        -->
+    <select id="updateDepartmentFatherById" resultType="com.zy.demo.pojo.Department">
+        SELECT * FROM department WHERE id=#{id}
+    </select>
+
+    <!--根据父级查询对应的子级部门信息详情进行修改
+        int updateDepartmentFather(Department department);
+   -->
+    <update id="updateDepartmentFather" parameterType="com.zy.demo.pojo.Department">
+        UPDATE department SET department_name = #{departmentName},department_num = #{departmentNum},department_status = #{departmentStatus} ,comment = #{comment} where id =#{id}
+    </update>
+
+    <!--给父级部门添加子集
+        int addDepartmentSon(Department department);
+   -->
+    <insert id="addDepartmentSon" parameterType="com.zy.demo.pojo.Department">
+           INSERT INTO department (department_name,department_num,department_status,comment,d_id)value (#{departmentName},#{departmentNum},#{departmentStatus},#{comment},#{dId})
+    </insert>
+
+    <!--查出子集
+        Department findDepartmentSonById(Integer id);
+    -->
+    <select id="findDepartmentSonById" resultType="com.zy.demo.pojo.Department">
+        SELECT * FROM department WHERE id=#{id}
+    </select>
+
+    <!--根据子集对应的父级查出子集
+        Department findDepartmentFatherAndSonById(Integer dId);
+       -->
+    <select id="findDepartmentFatherAndSonById" resultType="com.zy.demo.pojo.Department">
+        SELECT * FROM department WHERE id=#{dId}
+    </select>
+
+    <!--子级部门信息详情进行修改、数据回显
+        int updateDepartmentSon(Department department);
+    -->
+    <update id="updateDepartmentSon" parameterType="com.zy.demo.pojo.Department">
+        UPDATE department SET department_name = #{departmentName},department_num = #{departmentNum},department_status = #{departmentStatus},comment = #{comment} where id =#{id}
+    </update>
+
+    <!-- 查询所有部门 用来做部门人员角色修改
+        List<Department> findDepartmentUserAll();
+        -->
+    <select id="findDepartmentUserAll" resultType="com.zy.demo.pojo.Department">
+        SELECT * FROM department
+    </select>
+
+    <!--根据权限id查看部门员工
+        List<Department> findDepartmentUserById(Integer id);
+    -->
+    <select id="findDepartmentUserById" resultType="com.zy.demo.pojo.Department">
+       SELECT `user`.id AS user_id,`user`.user_name FROM `user` WHERE `user`.department_id =#{id}
+    </select>
+
+
+</mapper>

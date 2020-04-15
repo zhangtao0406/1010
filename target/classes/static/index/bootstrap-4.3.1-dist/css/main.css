@@ -1,0 +1,188 @@
+/* 以下实际使用若已初始化可删除 .nav height父级需逐级设置为100%*/
+ul{margin: 0; padding: 0;}
+li{list-style:none} 
+a{text-decoration:none;}
+/* 以上实际使用若已初始化可删除 */
+/* nav */
+.nav{height: 100%;transition: all .3s;}
+.nav a{display: block;overflow: hidden;padding-left: 20px;line-height: 46px;max-height: 46px;color: #ABB1B7;transition: all .3s;}
+.nav a span{margin-left: 30px;}
+.nav-item{position: relative;}
+.nav-item.nav-show{border-bottom: none;}
+.nav-item ul{display: none;background: rgba(0,0,0,.1);}
+.nav-item.nav-show ul{display: block;}
+.nav-item>a:before{content: "";position: absolute;left: 0px;width: 2px;height: 46px;background: #34A0CE;opacity:0;transition: all .3s;}
+.nav .nav-icon{font-size: 20px;position: absolute;margin-left:-1px;}
+/* 此处修改导航图标 可自定义iconfont 替换*/
+.icon_1::after{content: "\e62b";}
+.icon_2::after{content: "\e669";}
+.icon_3::after{content: "\e61d";}
+/*---------------------*/
+.nav-more{float:right;margin-right: 20px;font-size: 12px;transition: transform .3s;}
+/* 此处为导航右侧箭头 如果自定义iconfont 也需要替换*/
+.nav-more::after{content: "\e621";}
+/*---------------------*/
+.nav-show .nav-more{transform:rotate(90deg);}
+.nav-show,.nav-item>a:hover{color: #FFF;background:rgba(0,0,0,.1);}
+.nav-show>a:before,.nav-item>a:hover:before{opacity:1;}
+.nav-item li:hover a{color: #FFF;background: rgba(0, 0, 0,.1);}
+
+/* nav-mini */
+/* .nav-mini.nav{width: 60px;} */
+.nav-mini.nav .nav-icon{/* margin-left:-2px; */}
+.nav-mini.nav .nav-item>a span{display: none;}
+.nav-mini.nav .nav-more{margin-right: -20px;}
+.nav-mini.nav .nav-item ul{position: absolute;top:0px;left:60px;width: 180px;z-index: 99;background:#3C474C;overflow: hidden;}
+.nav-mini.nav .nav-item:hover{background:rgba(255,255,255,.1);}
+.nav-mini.nav .nav-item:hover .nav-item a{color:#FFF;}
+.nav-mini.nav .nav-item:hover a:before{opacity:1;}
+.nav-mini.nav .nav-item:hover ul{display: block;}
+
+.box{
+	height: calc(100vh);
+	overflow: hidden;
+}
+a{
+    text-decoration: none;
+}
+.header{
+    background-color: #393d49;
+    height: 60px;
+}
+.header h3{
+    color: white;
+}
+.header-right p{
+      color: white;
+      font-size: 18px;
+      line-height: 60px; 
+	  margin-bottom: 0;
+}
+.bt{
+   background-color: #393d49;
+   border: 0px;
+
+}
+.bod{
+    height: calc(100vh - 100px);
+    overflow: hidden;
+}
+.bt img{width: 30px; height: 30px;}
+.bt p{color: white}
+.bt:hover{background-color: #393d49;}
+.header-right .btn{
+    width: 100px;
+    margin-top: 13px;
+}
+.bod_left{
+    background-color: #393d49;
+	height: calc(100vh - 100px);
+	padding:0 0;
+}
+
+.bod_right{
+    height: calc(100vh - 100px);
+    background-color: white;
+    padding: 0;
+}
+.bod_right::-webkit-scrollbar{
+	width: 5px;
+	border-radius: 5px;
+	background: #eee;
+}
+.bod_right::-webkit-scrollbar-thumb{
+	background: #333;
+}
+.nav{
+	margin-right: 0;
+}
+.bod .row{
+	display: inline-block;
+	width: 100%;
+	margin-left: 0;
+}
+.bod_right .blogo{
+	margin: 2% 0 2% 8%;
+}
+
+.bod_right span{
+	display: inline-block;
+	height: 18px;
+	line-height: 18px;
+	border-left: 3px solid royalblue;
+	padding-left: 1%;
+}
+.bod_right .title{
+	margin-bottom: 1.5%;
+}
+.bod_right .ycj{
+	margin-top: 5%;
+}
+.ydd{
+	margin-top: 5%;
+}
+.tzgg .title{
+	padding-bottom: 2%;
+	border-bottom: 1px solid #eee;
+}
+.ydd span,.tzgg span{
+	display: inline-block;
+	height: 18px;
+	line-height: 18px;
+	border-left: 3px solid royalblue;
+	padding-left: 2%;
+}
+.tzgg span.pull-right{
+	border:none;
+}
+.tzgg .title a{
+	color: #000;
+}
+.tzgg .title a:hover{
+	text-decoration: underline;
+	cursor: pointer;
+}
+.tzgg .tzgglist li{
+	border: 1px solid #eee;
+	height: 35px;
+	line-height: 35px;
+	margin: 2% 0;
+	padding: 0 2%;
+}
+.tzgg .tzgglist li span{
+	border: 1px solid #eee;
+	margin-top: 5px;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	text-align: center;
+	border-radius: 50%;
+	color: #eee;
+	padding: 0;
+}
+.rxl_img{
+	background: url(../img/hticon1.png) no-repeat -11px -5px;
+	background-size: 100% 100%;
+}
+.rxl_img .row .col-md-3{
+	height: 120px;
+	text-align: center;
+	padding: 0;
+}
+.rxl_img .row .col-md-3 p{
+	position: relative;
+	top: 63px;
+	right: 3%;
+}
+.rxl_img .li1{
+}
+
+
+#chart1{
+	height: 300px;
+}
+#chart2{
+	height: 300px;
+}
+
+

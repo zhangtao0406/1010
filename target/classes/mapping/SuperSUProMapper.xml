@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zy.demo.mapper.SuperSUProMapper">
+
+    <!--查询所有角色信息
+        List<Role> findRoleAll(@Param ("roleName") String roleName,@Param ("roleStatus") String roleStatus);
+    -->
+    <select id="findRoleAll" resultType="com.zy.demo.pojo.Role">
+       SELECT * FROM role
+        <where>
+            <if test="roleName!=null and roleName!=''">
+                and role_name LIKE '%${roleName}%'
+            </if>
+            <if test="roleStatus!=null and roleStatus!=''">
+                and role_status = #{roleStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--角色添加
+        int findRoleAdd(@Param ("roleName") String roleName, @Param ("roleStatus") String roleStatus);
+    -->
+    <insert id="findRoleAdd">
+        insert  into role (role_name,create_time,role_status)
+                    values (#{roleName},now(),#{roleStatus})
+    </insert>
+
+    <!--根据id查询角色
+        Role findRoleAllById(Integer id);
+       -->
+    <select id="findRoleAllById" resultType="Role">
+        SELECT * FROM role where id = #{id}
+    </select>
+
+    <!--角色修改
+        int updateRole(@Param ("id") Integer id, @Param ("roleName") String roleName,@Param ("roleStatus") String roleStatus);
+    -->
+    <update id="updateRole">
+        UPDATE  role SET role_name = #{roleName},role_status = #{roleStatus} where id =#{id}
+    </update>
+
+    <!--查询所有权限
+        List<Power> findPowerAll();
+    -->
+    <select id="findPowerAll" resultType="Power">
+        SELECT * FROM power
+    </select>
+    <!--查询角色名称
+        List<Power> findRoleNameById(Integer id);
+    -->
+    <select id="findRoleNameById" resultType="com.zy.demo.pojo.Power">
+        SELECT * FROM role where id = #{id}
+    </select>
+
+    <!--添加角色权限
+        int findrolePowerAdd(String[] powerId, Integer id);
+   -->
+    <insert id="findrolePowerAdd">
+        insert into role_power(role_id,power_id)
+        <foreach collection="powerId" item="powerId" separator="," open="values">
+            (#{id},#{powerId})
+        </foreach>
+    </insert>
+
+
+    <!--查询回显用户角色id
+        List<Power> findRoleAllByid(Integer id);
+       -->
+    <select id="findRoleAllByid" resultType="com.zy.demo.pojo.Power">
+        SELECT
+	        role.id,role.role_name,power.id,power.power
+        FROM
+	        role,
+	        role_power,
+	        power
+        WHERE
+	        role.id = role_power.role_id
+        AND role_power.power_id = power.id
+        AND role.id = #{id}
+    </select>
+    <!--查询回显权限
+        List<Power> findRoleRoleAllByid(Integer id);
+    -->
+    <select id="findRoleRoleAllByid" resultType="com.zy.demo.pojo.Power">
+        SELECT
+	        power.power,
+	        power.p_id,
+	        power.id
+        FROM
+	        role_power,
+	        power
+        WHERE
+	        role_power.power_id = power.power_id
+        AND role_power.role_id = #{id}
+    </select>
+
+    <!--删除中间表信息
+    int findRolePowerDelete(Integer id);
+    -->
+    <delete id="findRolePowerDelete" parameterType="com.zy.demo.pojo.RolePower">
+        DELETE FROM role_power WHERE role_id = #{id}
+    </delete>
+
+</mapper>

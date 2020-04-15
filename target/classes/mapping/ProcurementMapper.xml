@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zy.demo.mapper.ProcurementMapper">
+
+    <!--采购申请管理模糊查询
+        List<Procurement> findProcurementAll(Procurement procurement);
+       -->
+    <select id="findProcurementAll" resultType="com.zy.demo.pojo.Procurement">
+        SELECT * FROM procurement
+        <where>
+            <if test="applyNum!=null and applyNum!=''">
+                and apply_num LIKE '%${applyNum}%'
+            </if>
+            <if test="applyName!=null and applyName!=''">
+                and apply_name LIKE '%${applyName}%'
+            </if>
+            <if test="procurementStatus!=null and procurementStatus!=''">
+                and procurement_status = #{procurementStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--查看今年采购申请管理 为了生成采购申请管理编号
+        Integer procurementCode(String year);
+    -->
+    <select id="procurementCode" resultType="Integer">
+        SELECT COUNT(1) FROM procurement where apply_time like "%"#{year}"%"
+    </select>
+
+    <!--添加采购申请管理待审批
+        int addProcurement(Procurement procurement);
+      -->
+    <insert id="addProcurement" parameterType="com.zy.demo.pojo.Procurement">
+        insert  into procurement (apply_num,apply_name,apply_time,procurement_status,comment,approval_name)
+                    values (#{applyNum},#{applyName},now(),1,#{comment},#{approvalName})
+    </insert>
+
+    <!--添加采购申请管理保存草稿
+        int addBaoCunProcurement(Procurement procurement);
+     -->
+    <insert id="addBaoCunProcurement" parameterType="com.zy.demo.pojo.Procurement">
+        insert  into procurement (apply_num,apply_name,apply_time,procurement_status,comment,approval_name)
+                    values (#{applyNum},#{applyName},now(),0,#{comment},#{approvalName})
+    </insert>
+
+    <!--采购申请管理详情
+        Procurement procurementAllById(Integer id);
+          -->
+    <select id="procurementAllById" resultType="com.zy.demo.pojo.Procurement">
+        SELECT * FROM procurement where id = #{id}
+    </select>
+
+    <!--采购物品
+        List<Goods> goodsMessageAll(Integer id);
+            -->
+    <select id="goodsMessageAll" resultType="com.zy.demo.pojo.Goods">
+        SELECT goods.* FROM procurement,goods WHERE procurement.id=goods.procurement_id AND  procurement.id = #{id}
+    </select>
+
+    <!--审批信息
+        List<GoodSapproval> goodSapprovalMessageAll(Integer id);
+        -->
+    <select id="goodSapprovalMessageAll" resultType="com.zy.demo.pojo.GoodSapproval">
+        SELECT good_sapproval.* FROM procurement,good_sapproval WHERE procurement.id = good_sapproval.procurement_id AND procurement.id = #{id}
+    </select>
+
+    <!--编辑采购申请管理
+        int procurementUpdate(Procurement procurement);
+        -->
+    <update id="procurementUpdate" parameterType="com.zy.demo.pojo.Procurement">
+        UPDATE procurement SET comment = #{comment},approval_name=#{approvalName} WHERE id=#{id}
+    </update>
+
+    <!--修改完为待审批
+        int procurementDaiShenPi(Integer id);
+       -->
+    <update id="procurementDaiShenPi">
+        UPDATE  procurement SET procurement_status =1 where id = #{id}
+    </update>
+
+    <!--采购申请管理撤回
+        int procurementCheHui(int id);
+        -->
+    <update id="procurementCheHui">
+        UPDATE  procurement SET procurement_status =5 where id = #{id}
+    </update>
+
+    <!--采购申请管理物品信息添加
+        int procurementAndGoods(Goods goods);
+         -->
+    <insert id="procurementAndGoods" parameterType="com.zy.demo.pojo.Goods">
+        insert  into goods (goods_name,goods_type,goods_unit,goods_amount,procurement_id) values (#{goodsName},#{goodsType},#{goodsUnit},#{goodsAmount},#{procurementId})
+    </insert>
+
+    <!--采购申请审批模糊查询
+        List<Procurement> findProcurementShenPiAll(Procurement procurement);
+           -->
+    <select id="findProcurementShenPiAll" resultType="com.zy.demo.pojo.Procurement">
+        SELECT * FROM procurement
+        <where>
+                procurement_status in (1,2,3,4)
+            <if test="applyNum!=null and applyNum!=''">
+                and apply_num LIKE '%${applyNum}%'
+            </if>
+            <if test="applyName!=null and applyName!=''">
+                and apply_name LIKE '%${applyName}%'
+            </if>
+            <if test="procurementStatus!=null and procurementStatus!=''">
+                and procurement_status = #{procurementStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--审批通过返回申请人
+         int procurementTongGuo(GoodSapproval goodSapproval);
+         -->
+    <insert id="procurementTongGuo" parameterType="com.zy.demo.pojo.GoodSapproval">
+        insert  into good_sapproval (approval_name,approval_time,approval_result,approval_opinion,procurement_id) values (#{approvalName},now(),#{approvalResult},#{approvalOpinion},#{procurementId})
+    </insert>
+
+    <!--通知表添加信息
+        int addNotice(Notice notice);
+         -->
+    <insert id="addNotice" parameterType="com.zy.demo.pojo.Notice">
+        insert  into notice (notice_name,create_time,notice_status,initiator) values (#{noticeName},now(),'0',#{initiator})
+    </insert>
+
+    <!--审批通过改为待入库
+        int TongGuo(Integer procurementId);
+        -->
+    <update id="TongGuo">
+        UPDATE  procurement SET procurement_status =2 where id = #{procurementId}
+    </update>
+
+    <!--审批不通过信息填写
+        int procurementBuTongGuo(GoodSapproval goodSapproval);
+        -->
+    <insert id="procurementBuTongGuo" parameterType="com.zy.demo.pojo.GoodSapproval">
+        insert  into good_sapproval (approval_name,approval_time,approval_result,approval_opinion,procurement_id) values (#{approvalName},now(),#{approvalResult},#{approvalOpinion},#{procurementId})
+    </insert>
+
+    <!--审批审批不通过改为已驳回
+        int BuTongGuo(Integer procurementId);
+       -->
+    <update id="BuTongGuo">
+        UPDATE  procurement SET procurement_status =4 where id = #{procurementId}
+    </update>
+
+    <!--采购入库模糊查询
+        List<Procurement> findProcurementRuKuAll(Procurement procurement);
+           -->
+    <select id="findProcurementRuKuAll" resultType="com.zy.demo.pojo.Procurement">
+        SELECT * FROM procurement
+        <where>
+            procurement_status in (2,3)
+            <if test="applyNum!=null and applyNum!=''">
+                and apply_num LIKE '%${applyNum}%'
+            </if>
+            <if test="procurementStatus!=null and procurementStatus!=''">
+                and procurement_status = #{procurementStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--采购入库并添加入库人
+        int ProcurementRuKu(@Param ("id") Integer id, @Param ("rukuName") String rukuName);
+     -->
+    <update id="ProcurementRuKu">
+        UPDATE  procurement SET procurement_status = 3,ruku_name=#{rukuName} where id = #{id}
+    </update>
+
+
+</mapper>

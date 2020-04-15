@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zy.demo.mapper.CheckingMapper">
+
+    <!--考勤数据导入模糊查询
+        List<Checking> findCheckingAll(Procurement procurement);
+      -->
+    <select id="findCheckingAll" resultType="com.zy.demo.pojo.Checking">
+        SELECT * FROM checking,department
+        <where>
+            checking.department_id = department.id AND checking.checking_status in(0,1,2,3) AND department.id in (1,2,3,4)
+            <if test="year!=null and year!=''">
+                and checking.year LIKE '%${year}%'
+            </if>
+            <if test="checkingStatus!=null and checkingStatus!=''">
+                and checking.checking_status = #{checkingStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--考勤
+        int addChecking(Checking checking);
+    -->
+    <insert id="addChecking" parameterType="com.zy.demo.pojo.Checking" keyProperty="id" useGeneratedKeys="true">
+        insert  into checking (year,month,user_name,operation_time,comment,file_name,file_url,checking_status,department_id)
+                    values (#{year},#{month},#{userName},now(),#{comment},#{fileName},#{fileUrl},0,#{departmentId})
+    </insert>
+
+    <!--考勤统计数据
+        int addCheckingStatistics(CheckingStatistics checkingStatistics);
+    -->
+    <insert id="addCheckingStatistics" parameterType="com.zy.demo.pojo.CheckingStatistics">
+        insert  into checking_statistics (checking_num,checking_name,post,turn_work,casual_leave,sick_leave,absenteeism,marriage_leave,maternity_leave,be_late,remark,signature,checking_id)
+                    values (#{checkingNum},#{checkingName},#{post},#{turnWork},#{casualLeave},#{sickLeave},#{absenteeism},#{marriageLeave},#{maternityLeave},#{beLate},#{remark},#{signature},#{checkingId})
+    </insert>
+
+    <!--考勤数据导入详情
+        Checking CheckingById(Integer id);
+      -->
+    <select id="CheckingById" resultType="com.zy.demo.pojo.Checking">
+        SELECT * FROM checking,department WHERE checking.department_id = department.id AND checking.id = #{id}
+    </select>
+
+
+    <!--考勤数据导入待统计
+        List<Checking> findCheckingTongJiAll(Checking checking);
+      -->
+    <select id="findCheckingTongJiAll" resultType="com.zy.demo.pojo.Checking">
+        SELECT checking.*,department.id,department.department_name FROM checking,department
+        <where>
+            checking.department_id = department.id AND checking.checking_status in(0,1,4)
+            <if test="year!=null and year!=''">
+                and checking.year LIKE '%${year}%'
+            </if>
+            <if test="checkingStatus!=null and checkingStatus!=''">
+                and checking.checking_status = #{checkingStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--根据考勤统计查询考勤数据
+        List<CheckingStatistics> checkingStatisticsMessageAllById(Integer id);
+     -->
+    <select id="checkingStatisticsMessageAllById" resultType="com.zy.demo.pojo.CheckingStatistics">
+        SELECT checking_statistics.* FROM checking,checking_statistics WHERE checking.id = checking_statistics.checking_id AND checking.id = #{id}
+    </select>
+
+    <!--考勤统计管理,统计
+        int updateTongJiChecking(Checking checking);
+         -->
+    <update id="updateTongJiChecking" parameterType="com.zy.demo.pojo.Checking">
+        UPDATE checking SET comment = #{comment},approval_name=#{approvalName} WHERE id=#{id}
+    </update>
+
+    <!--修改完为已统计
+        int checkingYiTongJi(Integer id);
+       -->
+    <update id="checkingYiTongJi">
+        UPDATE  checking SET checking_status =1 where id = #{id}
+    </update>
+
+    <!--考勤统计管理撤回
+        int checkingCheHui(int id);
+    -->
+    <update id="checkingCheHui">
+        UPDATE  checking SET checking_status =4 where id = #{id}
+    </update>
+
+    <!--考勤数据考勤审批
+        List<Checking> findCheckingShenPiAll(Checking checking);
+    -->
+    <select id="findCheckingShenPiAll" resultType="com.zy.demo.pojo.Checking">
+        SELECT * FROM checking,department
+        <where>
+            checking.department_id = department.id AND checking.checking_status in(1,2) AND department.id in (1,2,3,4)
+            <if test="year!=null and year!=''">
+                and checking.year LIKE '%${year}%'
+            </if>
+            <if test="checkingStatus!=null and checkingStatus!=''">
+                and checking.checking_status = #{checkingStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--修改完为已统计
+        int checkingWanChen(Integer id);
+    -->
+    <update id="checkingWanChen">
+        UPDATE  checking SET checking_status =2 where id = #{id}
+    </update>
+
+    <!--通知表添加信息
+        int addCheckingNotice(Notice notice);
+        -->
+    <insert id="addCheckingNotice" parameterType="com.zy.demo.pojo.Notice">
+        insert  into notice (notice_name,create_time,notice_status,initiator) values (#{noticeName},now(),'0',#{initiator})
+    </insert>
+
+    <!--修改完为已驳回
+        int checkingBoHui(Integer id);
+    -->
+    <update id="checkingBoHui">
+        UPDATE  checking SET checking_status =3 where id = #{id}
+    </update>
+</mapper>

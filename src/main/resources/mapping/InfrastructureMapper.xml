@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zy.demo.mapper.InfrastructureMapper">
+
+    <!--基础设施档案的模糊
+        List<Infrastructure> findInfrastructureAll(Infrastructure infrastructure);
+    -->
+    <select id="findInfrastructureAll" resultType="com.zy.demo.pojo.Infrastructure">
+        SELECT
+	        infrastructure.*, facility.id,
+	        facility.facility_name
+        FROM
+	        infrastructure,
+	        facility
+        <where>
+            infrastructure.facility_id = facility.id
+            <if test="infrastructureName!=null and infrastructureName!=''">
+                and infrastructure.infrastructure_name LIKE '%${infrastructureName}%'
+            </if>
+            <if test="maintainPeriod!=null and maintainPeriod!=''">
+                and infrastructure.maintain_period LIKE '%${maintainPeriod}%'
+            </if>
+            <if test="facilityName!=null and facilityName!=''">
+                and facility.facility_name LIKE '%${facilityName}%'
+            </if>
+            <if test="infrastructureStatus!=null and infrastructureStatus!=''">
+                and infrastructure.Infrastructure_status = #{infrastructureStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--基础设施类型
+        List<Facility> facilityAll();
+   -->
+    <select id="facilityAll" resultType="com.zy.demo.pojo.Facility">
+        SELECT * FROM facility
+    </select>
+
+    <!--添加基础设施档案
+        int addInfrastructure(Infrastructure infrastructure);
+    -->
+    <insert id="addInfrastructure" parameterType="com.zy.demo.pojo.Infrastructure" keyProperty="id" useGeneratedKeys="true">
+        insert  into infrastructure (infrastructure_name,Infrastructure_status,price,department_id,principal,principal_phone,location,longitude,dimension,maintain_period,next_maintain,facility_id,announcements)
+                    values (#{infrastructureName},0,#{price},#{departmentId},#{principal},#{principalPhone},#{location},#{longitude},#{dimension},#{maintainPeriod},#{nextMaintain},#{facilityId},#{announcements})
+    </insert>
+
+    <!--添加附件
+        int addInfrastructureAndAccessory(Accessory accessory);
+       -->
+    <insert id="addInfrastructureAndAccessory" parameterType="com.zy.demo.pojo.Accessory">
+        insert  into accessory (infrastructure_id,accessory_name,accessory_url)
+                    values (#{infrastructureId},#{accessoryName},#{accessoryUrl})
+    </insert>
+
+    <!--根据id查询基础设施档案
+        Infrastructure InfrastructureById(Integer id);
+        -->
+    <select id="InfrastructureById" resultType="com.zy.demo.pojo.Infrastructure">
+        SELECT
+	        infrastructure.*, facility.id,
+	        facility.facility_name,department.id,department.department_name
+        FROM
+	        infrastructure,
+	        facility,department
+        WHERE
+	        infrastructure.facility_id = facility.id AND infrastructure.department_id=department.id AND infrastructure.id =#{id}
+    </select>
+
+    <!--编辑基础设施档案
+        int updateInfrastructure(Infrastructure infrastructure);
+    -->
+    <update id="updateInfrastructure" parameterType="com.zy.demo.pojo.Infrastructure">
+        UPDATE infrastructure SET infrastructure_name = #{infrastructureName},Infrastructure_status=#{infrastructureStatus},price=#{price},department_id=#{departmentId},principal=#{principal},principal_phone=#{principalPhone},location=#{location},longitude=#{longitude},dimension=#{dimension},maintain_period=#{maintainPeriod},next_maintain=#{nextMaintain},facility_id=#{facilityId},announcements=#{announcements} WHERE id=#{id}
+    </update>
+
+    <!--根据id查询基础设施档案图片
+        List<Infrastructure> infrastructureAndAccessoryAllById(Integer id);
+    -->
+    <select id="infrastructureAndAccessoryAllById" resultType="com.zy.demo.pojo.Infrastructure">
+        SELECT accessory.* FROM infrastructure,accessory WHERE infrastructure.id = accessory.infrastructure_id AND accessory.infrastructure_id=#{id}
+    </select>
+
+    <!--基础设施类型模糊
+        List<Facility> findFacilityAll(Facility facility);
+   -->
+    <select id="findFacilityAll" resultType="com.zy.demo.pojo.Facility">
+        SELECT facility.*,department.id,department.department_name FROM facility,department
+        <where>
+            facility.department_id=department.id
+            <if test="facilityNum!=null and facilityNum!=''">
+                and facility.facility_num LIKE '%${facilityNum}%'
+            </if>
+            <if test="departmentName!=null and departmentName!=''">
+                and department.department_name LIKE '%${departmentName}%'
+            </if>
+            <if test="facilityName!=null and facilityName!=''">
+                and facility.facility_name LIKE '%${facilityName}%'
+            </if>
+            <if test="facilityStatus!=null and facilityStatus!=''">
+                and facility.facility_status = #{facilityStatus}
+            </if>
+        </where>
+    </select>
+
+    <!--查看今年基础设施类型 为了生成员工编号
+        Integer facilityCode(String year);
+    -->
+    <select id="facilityCode" resultType="Integer">
+        SELECT COUNT(1) FROM facility where create_time like "%"#{year}"%"
+    </select>
+
+    <!--基础设施类型新增
+        int addInFacility(Facility facility);
+      -->
+    <insert id="addInFacility" parameterType="com.zy.demo.pojo.Facility">
+        insert  into facility (facility_num,facility_name,department_id,facility_status,takt_time,administrator,create_time,comment)
+                    values (#{facilityNum},#{facilityName},#{departmentId},#{facilityStatus},#{taktTime},#{administrator},now(),#{comment})
+    </insert>
+
+    <!--基础设施类型详情
+        Facility facilityById(Integer id);
+    -->
+    <select id="facilityById" resultType="com.zy.demo.pojo.Facility">
+        SELECT facility.*,department.id,department.department_name FROM facility,department WHERE facility.department_id=department.id AND facility.id=#{id}
+    </select>
+
+    <!--编辑基础设施类型
+        int updateFacility(Facility facility);
+    -->
+    <update id="updateFacility" parameterType="com.zy.demo.pojo.Facility">
+        UPDATE facility SET facility_num = #{facilityNum},facility_name=#{facilityName},department_id=#{departmentId},facility_status=#{facilityStatus},takt_time=#{taktTime},administrator=#{administrator},comment=#{comment} WHERE id=#{id}
+    </update>
+
+</mapper>
