@@ -87,7 +87,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.17</version>
+            <version>5.4.0</version>
         </dependency>
 
         <dependency>
@@ -98,7 +98,7 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>3.15-beta2</version>
+            <version>5.4.0</version>
         </dependency>
         <!--阿里云oss上传-->
         <dependency>
